@@ -28,7 +28,8 @@ Shows write I/O statistics that may relate to nologging write I/O in time period
 import myplot
 import util
 
-def nologging(start_time,end_time,instance_number):
+
+def nologging(start_time, end_time, instance_number):
     """
     NOLOGGING activity by snapshot
     """
@@ -66,7 +67,7 @@ algwr.FUNCTION_NAME = 'LGWR' and
 blgwr.FUNCTION_NAME = algwr.FUNCTION_NAME and
 sn.END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
     q_string += start_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -80,16 +81,17 @@ order by sn.END_INTERVAL_TIME
 """
     return q_string
 
-database,dbconnection = util.script_startup('NOLOGGING Write IO')
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-1900 12:00:00')
+database, dbconnection = util.script_startup('NOLOGGING Write IO')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-1900 12:00:00')
 
-instance_number=util.input_with_default('Database Instance (1 if not RAC)','1')
- 
-querytext = nologging(start_time,end_time,instance_number)
-    
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
+
+instance_number = util.input_with_default('Database Instance (1 if not RAC)', '1')
+
+querytext = nologging(start_time, end_time, instance_number)
+
 results = dbconnection.run_return_flipped_results(querytext)
 
 util.exit_no_results(results)
@@ -98,10 +100,10 @@ util.exit_no_results(results)
 
 myplot.xdatetimes = results[0]
 myplot.ylists = results[1:]
-    
-myplot.title = "Write IO that may relate to NOLOGGING for "+database+" database, instance "+instance_number
+
+myplot.title = "Write IO that may relate to NOLOGGING for " + database + " database, instance " + instance_number
 myplot.ylabel1 = "Megabytes"
-    
-myplot.ylistlabels=["Direct Writes","DBWR","LGWR"]
+
+myplot.ylistlabels = ["Direct Writes", "DBWR", "LGWR"]
 
 myplot.line()

@@ -84,15 +84,16 @@ database clients are consuming the most database cpu resources.
 
 """
 
+
 class cpubymachine():
-    def __init__(self,day,start_hour,stop_hour):
+    def __init__(self, day, start_hour, stop_hour):
         self.day = day.upper()
         self.start_hour = start_hour
         self.stop_hour = stop_hour
         self.labels = []
         self.machines = []
-         
-    def add_machine(self,machine,label):
+
+    def add_machine(self, machine, label):
         """ 
         Record a relationship between a machine name and
         a meaningful label of your choice. I.e. machine=webhost
@@ -108,8 +109,8 @@ class cpubymachine():
             self.labels.append(label)
         # machines has one entry per machine.
         # could have multiple entries for the same label
-        self.machines.append([label,machine.upper()])
-        
+        self.machines.append([label, machine.upper()])
+
     def build_case(self):
         """
         This function builds this part of our example SQL statement:
@@ -124,19 +125,19 @@ ELSE 'OTHER' END
         """
         case_string = "CASE \n"
         for l in self.labels:
-            case_string +=  "WHEN "
+            case_string += "WHEN "
             first_machine = True
             for m in self.machines:
                 if m[0] == l:
                     if not first_machine:
-                       case_string +=  " OR "
+                        case_string += " OR "
                     else:
-                       first_machine = False
-                    case_string += " UPPER(MACHINE) like '%"+m[1]+"%' "
-            case_string += " THEN '"+l+"'\n"
+                        first_machine = False
+                    case_string += " UPPER(MACHINE) like '%" + m[1] + "%' "
+            case_string += " THEN '" + l + "'\n"
         case_string += "ELSE 'OTHER' END"
         return case_string
-         
+
     def build_sample_time(self):
         """
         Builds this part of our example SQL:
@@ -147,14 +148,14 @@ to_number(to_char(SAMPLE_TIME,'HH24')) between 8 and 17 and
         Puts in the day of the week and start and stop time.
 
         """
-        st_string = "to_char(SAMPLE_TIME,'DAY')='"+self.day
-        for i in range(9-len(self.day)):
-           st_string += " "
+        st_string = "to_char(SAMPLE_TIME,'DAY')='" + self.day
+        for i in range(9 - len(self.day)):
+            st_string += " "
         st_string += "' and\n"
         st_string += "to_number(to_char(SAMPLE_TIME,'HH24')) between "
-        st_string += str(self.start_hour)+" and "+str(self.stop_hour)+" and\n"
+        st_string += str(self.start_hour) + " and " + str(self.stop_hour) + " and\n"
         return st_string
-        
+
     def build_query(self):
         """ puts the query together"""
         q_string = """
@@ -165,7 +166,7 @@ select
         q_string += self.build_case()
         q_string += """ labels,
 to_char(sample_time,'YYYY-MM-DD') """
-        q_string += self.day+"_DATE,\n"
+        q_string += self.day + "_DATE,\n"
         q_string += """(count(*)*10)/(10*3600*(select to_number(value) from v$parameter where name='cpu_count')) percent_cpu
 from DBA_HIST_ACTIVE_SESS_HISTORY
 where
@@ -184,11 +185,12 @@ sum(percent_cpu)
 for labels in (
 """
         for l in self.labels:
-             q_string += "'"+l+"',\n"
+            q_string += "'" + l + "',\n"
         q_string += "'OTHER'\n"
-        q_string += ")) order by "+self.day+"_DATE"
-        
+        q_string += ")) order by " + self.day + "_DATE"
+
         return q_string
+
 
 """
 
@@ -215,62 +217,64 @@ _PERM will grow and have entries for every day.
 
 """
 
+
 class day_history:
-    def __init__(self,db_connection,day,queryname,query):
+    def __init__(self, db_connection, day, queryname, query):
         self.db_connection = db_connection
         self.day = day.upper()
         self.queryname = queryname.upper()
-        self.perm_table_name =  self.day+self.queryname+"_PERM"
-        self.temp_table_name =  self.day+self.queryname+"_TEMP"
+        self.perm_table_name = self.day + self.queryname + "_PERM"
+        self.temp_table_name = self.day + self.queryname + "_TEMP"
         self.query = query
+
     def save_day_results(self):
-        
-        day_column = self.day+'_DATE'
-       
+
+        day_column = self.day + '_DATE'
+
         # check if permanent table exists
-        
+
         check_query = "select count(*) from user_tables where table_name ='"
-        check_query += self.perm_table_name+"'"
+        check_query += self.perm_table_name + "'"
         results = self.db_connection.run_return_all_results(check_query)
         perm_exists = results[0][0] == 1
 
         # check if temporary table exists
-        
+
         check_query = "select count(*) from user_tables where table_name ='"
-        check_query += self.temp_table_name+"'"
+        check_query += self.temp_table_name + "'"
         results = self.db_connection.run_return_all_results(check_query)
         temp_exists = results[0][0] == 1
-                                
+
         # create permanent table for results if not already present
         # create temporary table for this run if needed and add rows
         # to permanent table
-               
+
         if not perm_exists:
             # populate new perm table with results of query
-            create_string = 'create table '+self.perm_table_name+' as '+self.query
+            create_string = 'create table ' + self.perm_table_name + ' as ' + self.query
             self.db_connection.run_return_no_results(create_string)
         else:
             # create empty temp table and load with results of query
             if temp_exists:
-                drop_string = 'drop table '+self.temp_table_name
+                drop_string = 'drop table ' + self.temp_table_name
                 self.db_connection.run_return_no_results(drop_string)
-                
-            create_string = 'create table '+self.temp_table_name+' as '+self.query
+
+            create_string = 'create table ' + self.temp_table_name + ' as ' + self.query
             self.db_connection.run_return_no_results(create_string)
-            
+
             # delete records in perm that are in temp to avoid 
             # inserting duplicates
-            delete_string = 'delete from '+self.perm_table_name
-            delete_string += ' where '+day_column+' in (select '
-            delete_string += day_column+' from '+self.temp_table_name+')'
+            delete_string = 'delete from ' + self.perm_table_name
+            delete_string += ' where ' + day_column + ' in (select '
+            delete_string += day_column + ' from ' + self.temp_table_name + ')'
             self.db_connection.run_return_no_results(delete_string)
-           
+
             # insert temp rows into perm table
-            insert_string = 'insert into '+self.perm_table_name
-            insert_string += ' select * from '+self.temp_table_name
+            insert_string = 'insert into ' + self.perm_table_name
+            insert_string += ' select * from ' + self.temp_table_name
             self.db_connection.run_return_no_results(insert_string)
             self.db_connection.commit()
-            
+
         """
         Make final select follow this pattern:
             
@@ -287,61 +291,62 @@ class day_history:
         stored older values from earlier runs.
         
         """
-        query_string="""select * from     
+        query_string = """select * from     
             (select * from 
-                (select * from """    
-        query_string +=self.perm_table_name+' order by '
-        query_string +=day_column
-        query_string +=""" desc) 
+                (select * from """
+        query_string += self.perm_table_name + ' order by '
+        query_string += day_column
+        query_string += """ desc) 
             where rownum < 41)
-        order by """+day_column
-                    
+        order by """ + day_column
+
         return self.db_connection.run_return_all_results(query_string)
-                        
+
     def get_column_names(self):
         return self.db_connection.get_column_names()
-        
+
+
 # Main program starts here
 
-database,dbconnection = util.script_startup('Database CPU by Application Area')
+database, dbconnection = util.script_startup('Database CPU by Application Area')
 
-day=util.input_no_default('Enter day of week: ')
-    
-user=util.my_oracle_user
- 
-c = cpubymachine(day,8,17)
-    
-lines = util.read_config_file(util.config_dir,database+util.ashcpu_file)
+day = util.input_no_default('Enter day of week: ')
+
+user = util.my_oracle_user
+
+c = cpubymachine(day, 8, 17)
+
+lines = util.read_config_file(util.config_dir, database + util.ashcpu_file)
 
 for l in lines:
     args = l.split()
     if len(args) == 2:
-        c.add_machine(args[0],args[1])
-    
+        c.add_machine(args[0], args[1])
+
 querytext = c.build_query()
-    
-h = day_history(dbconnection,day,'ASHCPUBYMACHINE',querytext)
-    
+
+h = day_history(dbconnection, day, 'ASHCPUBYMACHINE', querytext)
+
 results = h.save_day_results()
-    
+
 column_names = h.get_column_names()
-    
+
 # Load global variables for graph    
 
 # Build list of labels for the bars
-           
+
 myplot.xlabels = []
 for r in results:
     myplot.xlabels.append(r[0])
-        
+
 # Build a list of lists of y values
 # and a list of the labels for each y value
 
-myplot.ylists =  []
+myplot.ylists = []
 myplot.ylistlabels = []
-    
-for i in range(1,len(column_names)):
-    yl=[]
+
+for i in range(1, len(column_names)):
+    yl = []
     for r in results:
         val = 100.0 * myplot.nonetozero(r[i])
         yl.append(val)
@@ -350,11 +355,11 @@ for i in range(1,len(column_names)):
 
 # Misc labels and names
 
-myplot.title = database.upper()+' CPU Working Hours '+day.capitalize()+'s'
+myplot.title = database.upper() + ' CPU Working Hours ' + day.capitalize() + 's'
 myplot.ylabel1 = 'CPU % Utilization'
 myplot.yticksuffix = '%'
-myplot.filename = day.lower()+'.png'
+myplot.filename = day.lower() + '.png'
 
 # Run stacked bar graph
-    
+
 myplot.stacked_bar()

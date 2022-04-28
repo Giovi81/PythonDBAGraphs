@@ -8,23 +8,27 @@ are helpful for Oracle database performance tuning.
 * `ashcpu.py` - Shows cpu usage within an Oracle database by various parts of the application.
 
 * `onewait.py` - Shows the average time for an Oracle wait event and the number of events per period.
-          
+
 * `simplesqlstat.py` - Show average elapsed versus executions for one SQL statement.
 
 * `allsql.py` - Show average elapsed versus executions for all SQL statements.
-         
-* `groupsigs.py` - Show average elapsed versus executions for SQL statements whose force matching signature is in a specified group of signatures.
-          
-* `sigscpuio.py` - Show total elapsed, CPU, and IO time for SQL statements whose force matching signature is in a specified group of signatures.
 
-* `sigselapctcpu.py` - Show total elapsed for SQL statements whose force matching signature is in a specified group of signatures. Show percent CPU used on same graph.
+* `groupsigs.py` - Show average elapsed versus executions for SQL statements whose force matching signature is in a
+  specified group of signatures.
 
-* `sigfour.py` - Four metrics for SQL statements whose force matching signature is in a specified group of signatures. These are number of executions, average elapsed time, CPU percent used, and average single block read time.
-          
+* `sigscpuio.py` - Show total elapsed, CPU, and IO time for SQL statements whose force matching signature is in a
+  specified group of signatures.
+
+* `sigselapctcpu.py` - Show total elapsed for SQL statements whose force matching signature is in a specified group of
+  signatures. Show percent CPU used on same graph.
+
+* `sigfour.py` - Four metrics for SQL statements whose force matching signature is in a specified group of signatures.
+  These are number of executions, average elapsed time, CPU percent used, and average single block read time.
+
 * `ashcount.py` - For a time range show the number of active sessions on CPU and total number active.
 
 * `sqlstatwithplans.py` - Show execution time of a single SQL statement by plan.
-                      
+
 * `sessioncounts.py` - Plot the number of connected sessions.
 
 * `segstat.py` - Segment usage statistics for one segment
@@ -44,8 +48,9 @@ are helpful for Oracle database performance tuning.
 * `nologging.py` - Write I/O statistics that may relate to nologging write I/O
 
 * `ashcpuprog.py` - Similar to ashcpu.py but using PROGRAM instead of MACHINE. Works with 10.2.
-          
+
 ## Command line help:
+
 ```
 usage: ashcpu.py [-h] {file,screen} [database] {Y,N} {Y,N}
 
@@ -60,20 +65,21 @@ positional arguments:
 optional arguments:
   -h, --help     show this help message and exit
 ```
+
 See file `README.md` for more detailed help.
 
 ### Example:
 
 `python onewait.py screen ORCL N N`
 
-This creates the onewait.py graph on the ORCL database and sends the output to 
+This creates the onewait.py graph on the ORCL database and sends the output to
 the screen. It does not display the SQL used and it does not output the
 data returned by the query.
 
 ## Three other included scripts:
 
 * `colorsquares.py` - shows a range of colors. I used this to pick the colors
-for the graphs.
+  for the graphs.
 
 ### Example:
 
@@ -81,7 +87,8 @@ for the graphs.
 
 Sets red at 0.5 and shows range of colors varying blue and green between 0.0 and 1.0.
 
-* `show_saved.py` - Displays a graph based on data saved from an earlier run. Prompts for the name of the file that was previously saved.
+* `show_saved.py` - Displays a graph based on data saved from an earlier run. Prompts for the name of the file that was
+  previously saved.
 
 ### Example:
 
@@ -92,6 +99,7 @@ Sets red at 0.5 and shows range of colors varying blue and green between 0.0 and
 * `setpassword.py` - Saves an encrypted version of your Oracle password.
 
 ### Example:
+
 ```
 python setpassword.py
 Enter password for MYUSER: MYPASSWORD
@@ -131,10 +139,13 @@ Run this command:
 `python s.py --verbose-helpful `
 
 Output includes a line like this:
+
 ```
 loaded rc file C:\Users\myuser\AppData\Local\Programs\Python\Python36-32\lib\site-packages\matplotlib\mpl-data\matplotlibrc
 ```
+
 I edited the matplotlibrc to use wx by setting backend to WXAgg. Here is the diff from the original matplotlibrc:
+
 ```
 diff matplotlibrc.original matplotlibrc
 38c38
@@ -142,11 +153,12 @@ diff matplotlibrc.original matplotlibrc
 ---
 > backend      : WXAgg
 ```
+
 ## Configuration:
 
 The program uses certain directories. The paths to these directories
-are stored in the file `directories.txt` which is kept in the same 
-location as the `util.py` script. The directories are the configuration, 
+are stored in the file `directories.txt` which is kept in the same
+location as the `util.py` script. The directories are the configuration,
 password, and output directories.
 
 The configuration directory contains the file `username.txt`
@@ -156,7 +168,8 @@ It also contains database and graph specific configuration files:
 
 * `DBNAMEashcpufile.txt` - `ashcpu.py` configuration for database DBNAME
 
-* `DBNAMEgroupofsignatures.txt` - SQL signatures for database DBNAME for graphs with "sig" in their name such as `sigscpuio.py`.
+* `DBNAMEgroupofsignatures.txt` - SQL signatures for database DBNAME for graphs with "sig" in their name such
+  as `sigscpuio.py`.
 
 The configuration directory also contains a file with the password encryption key.
 
@@ -169,10 +182,12 @@ The output directory is where image files are written if you choose
 You can test these scripts interactively through IDLE by setting the arguments
 at the top of the script. So, if you want to test `ashonewait.py` put these lines
 at the top of the file:
+
 ```
 import sys
 sys.argv = ['x','screen','YOURDB','N','N']
 ```
+
 Once you are done testing remove these lines and run the script from the command line.
 
 Related blog posts:

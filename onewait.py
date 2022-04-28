@@ -27,20 +27,21 @@ Graph of one wait event
 
 import myplot
 import util
-        
-def onewait(wait_event,minimum_waits,start_time,end_time,instance_number):
+
+
+def onewait(wait_event, minimum_waits, start_time, end_time, instance_number):
     q_string = """
 select 
 sn.END_INTERVAL_TIME,
 (after.total_waits-before.total_waits) NUMBER_OF_WAITS,
 (after.time_waited_micro-before.time_waited_micro)/(after.total_waits-before.total_waits) AVG_MICROSECONDS
 from DBA_HIST_SYSTEM_EVENT before, DBA_HIST_SYSTEM_EVENT after,DBA_HIST_SNAPSHOT sn
-where before.event_name='""" 
+where before.event_name='"""
     q_string += wait_event
     q_string += """' and
 END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
     q_string += start_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -63,31 +64,33 @@ order by after.snap_id
 """
     return q_string
 
-database,dbconnection = util.script_startup('One wait event')
+
+database, dbconnection = util.script_startup('One wait event')
 
 # Get user input
 
-wait_event=util.input_with_default('wait event','db file sequential read')
+wait_event = util.input_with_default('wait event', 'db file sequential read')
 
-min_waits=int(util.input_with_default('minimum number of waits per hour','0'))
+min_waits = int(util.input_with_default('minimum number of waits per hour', '0'))
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-1900 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-1900 12:00:00')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
 
-instance_number=util.input_with_default('Database Instance (1 if not RAC)','1')
+instance_number = util.input_with_default('Database Instance (1 if not RAC)', '1')
 
 # Build and run query
 
-q = onewait(wait_event,min_waits,start_time,end_time,instance_number);
+q = onewait(wait_event, min_waits, start_time, end_time, instance_number);
 
 r = dbconnection.run_return_flipped_results(q)
 
 util.exit_no_results(r)
 
 # plot query
-    
-myplot.title = "'"+wait_event+"' waits on "+database+" database, instance "+instance_number+", minimum waits="+str(min_waits)
+
+myplot.title = "'" + wait_event + "' waits on " + database + " database, instance " + instance_number + ", minimum waits=" + str(
+    min_waits)
 myplot.ylabel1 = "Number of events"
 myplot.ylabel2 = "Averaged Elapsed Microseconds"
 

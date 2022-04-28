@@ -28,7 +28,8 @@ Graph execution time by plan.
 import myplot
 import util
 
-def sqlstatwithplans(sql_id,start_time,end_time,instance_number):
+
+def sqlstatwithplans(sql_id, start_time, end_time, instance_number):
     q_string = """
 select 
 END_INTERVAL_TIME,
@@ -44,7 +45,7 @@ ss.executions_delta,
 case ss.executions_delta when 0 then 1 else ss.executions_delta end nonzeroexecutions,
 ELAPSED_TIME_DELTA
 from DBA_HIST_SQLSTAT ss,DBA_HIST_SNAPSHOT sn
-where ss.sql_id = '""" 
+where ss.sql_id = '"""
     q_string += sql_id
     q_string += """'
 and ss.snap_id=sn.snap_id
@@ -54,7 +55,7 @@ and ss.INSTANCE_NUMBER = """
 and ss.INSTANCE_NUMBER=sn.INSTANCE_NUMBER and
 END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
     q_string += start_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -65,19 +66,20 @@ to_date('"""
 order by snap_id,sql_id,plan_hash_value"""
     return q_string
 
-database,dbconnection = util.script_startup('Graph execution time by plan')
+
+database, dbconnection = util.script_startup('Graph execution time by plan')
 
 # Get user input
 
-sql_id=util.input_with_default('SQL_ID','dkqs29nsj23jq')
+sql_id = util.input_with_default('SQL_ID', 'dkqs29nsj23jq')
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-1900 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-1900 12:00:00')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
 
-instance_number=util.input_with_default('Database Instance (1 if not RAC)','1')
+instance_number = util.input_with_default('Database Instance (1 if not RAC)', '1')
 
-mainquery = sqlstatwithplans(sql_id,start_time,end_time,instance_number)
+mainquery = sqlstatwithplans(sql_id, start_time, end_time, instance_number)
 
 mainresults = dbconnection.run_return_flipped_results(mainquery)
 
@@ -112,9 +114,9 @@ distinct_date_times = []
 for dt in date_times:
     if dt not in distinct_date_times:
         distinct_date_times.append(dt)
-          
+
 # create list with empty list for each plan    
-                        
+
 elapsed_by_plan = []
 for p in distinct_plans:
     elapsed_by_plan.append([])
@@ -125,22 +127,22 @@ for p in distinct_plans:
 for ddt in distinct_date_times:
     for elist in elapsed_by_plan:
         elist.append(0.0)
-    
+
 # update an entry for each row.
 
 for i in range(num_rows):
     date_index = distinct_date_times.index(date_times[i])
     plan_num = distinct_plans.index(str(plan_hash_values[i]))
     elapsed_by_plan[plan_num][date_index] = elapsed_times[i]
-            
+
 # plot query
-    
+
 myplot.xdatetimes = distinct_date_times
 myplot.ylists = elapsed_by_plan
 
-myplot.title = "Sql_id "+sql_id+" on "+database+" database, instance "+instance_number+" with plans"
+myplot.title = "Sql_id " + sql_id + " on " + database + " database, instance " + instance_number + " with plans"
 myplot.ylabel1 = "Averaged Elapsed Seconds"
-    
-myplot.ylistlabels=distinct_plans
+
+myplot.ylistlabels = distinct_plans
 
 myplot.line()

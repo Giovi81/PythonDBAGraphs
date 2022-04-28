@@ -28,7 +28,8 @@ Shows the growth in tablespace usage and allocation over time.
 import myplot
 import util
 
-def spaceq(start_time,end_time):
+
+def spaceq(start_time, end_time):
     """
     Build query for given statistic name stat_name.
     """
@@ -50,7 +51,7 @@ tsu.TABLESPACE_ID = vt.TS# and
 vt.NAME = dt.TABLESPACE_NAME and
 snap.END_INTERVAL_TIME
 between 
-to_date('""" 
+to_date('"""
     q_string += start_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -59,19 +60,20 @@ to_date('"""
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 group by snap.END_INTERVAL_TIME
 order by snap.END_INTERVAL_TIME"""
-    
+
     return q_string
 
-database,dbconnection = util.script_startup('Tablespace usage')
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2018 12:00:00')
+database, dbconnection = util.script_startup('Tablespace usage')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2018 12:00:00')
+
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
 
 # Get and run query for one system statistic
- 
-querytext = spaceq(start_time,end_time)
-  
+
+querytext = spaceq(start_time, end_time)
+
 results = dbconnection.run_return_flipped_results(querytext)
 
 util.exit_no_results(results)
@@ -80,10 +82,10 @@ util.exit_no_results(results)
 
 myplot.xdatetimes = results[0]
 myplot.ylists = results[1:]
-    
-myplot.title = "Tablespace usage for "+database+" database"
+
+myplot.title = "Tablespace usage for " + database + " database"
 myplot.ylabel1 = "Gigabytes"
-    
-myplot.ylistlabels=["Allocated","Used"]
+
+myplot.ylistlabels = ["Allocated", "Used"]
 
 myplot.line()

@@ -28,7 +28,8 @@ Graph i/o metrics for overall database.
 import myplot
 import util
 
-def iosummary(start_time,end_time,instance_number):
+
+def iosummary(start_time, end_time, instance_number):
     q_string = """
 select 
 sn.END_INTERVAL_TIME,
@@ -58,7 +59,7 @@ after.PHYRDS >= before.PHYRDS and
 after.PHYWRTS >= before.PHYWRTS and
 END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
     q_string += start_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -70,15 +71,16 @@ order by sn.END_INTERVAL_TIME
 """
     return q_string
 
-database,dbconnection = util.script_startup('I/O Summary')
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-1900 12:00:00')
+database, dbconnection = util.script_startup('I/O Summary')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-1900 12:00:00')
 
-instance_number=util.input_with_default('Database Instance (1 if not RAC)','1')
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
 
-query = iosummary(start_time,end_time,instance_number)
+instance_number = util.input_with_default('Database Instance (1 if not RAC)', '1')
+
+query = iosummary(start_time, end_time, instance_number)
 
 results = dbconnection.run_return_flipped_results(query)
 
@@ -90,19 +92,19 @@ terabytes_written = results[2]
 ave_read_time_milliseconds = results[3]
 ave_write_time_milliseconds = results[4]
 num_rows = len(date_times)
-            
-# plot query
-    
-myplot.xdatetimes = date_times
-myplot.ylists = [terabytes_read,terabytes_written,ave_read_time_milliseconds,ave_write_time_milliseconds]
 
-myplot.title = "IO summary for "+database+" database, instance "+instance_number
+# plot query
+
+myplot.xdatetimes = date_times
+myplot.ylists = [terabytes_read, terabytes_written, ave_read_time_milliseconds, ave_write_time_milliseconds]
+
+myplot.title = "IO summary for " + database + " database, instance " + instance_number
 myplot.ylabel1 = "Terabytes read"
 myplot.ylabel2 = "Terabytes written"
 myplot.ylabel3 = "Average read time in milliseconds"
 myplot.ylabel4 = "Average write time in milliseconds"
 
-myplot.ylistlabels=["Terabytes read","Terabytes written","Average read time in milliseconds", \
-"Average write time in milliseconds"]
+myplot.ylistlabels = ["Terabytes read", "Terabytes written", "Average read time in milliseconds", \
+                      "Average write time in milliseconds"]
 
 myplot.line_4subplots()

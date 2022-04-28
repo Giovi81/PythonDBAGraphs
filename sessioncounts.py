@@ -28,7 +28,8 @@ Graph connected session count
 import myplot
 import util
 
-def sessioncounts(start_time,end_time,instance_number):
+
+def sessioncounts(start_time, end_time, instance_number):
     q_string = """select 
 snap.END_INTERVAL_TIME,
 stat.value session_count
@@ -45,7 +46,7 @@ stat.INSTANCE_NUMBER = snap.INSTANCE_NUMBER and
 stat.STAT_NAME = 'logons current' and
 snap.END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
     q_string += start_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -56,15 +57,16 @@ order by
 snap.END_INTERVAL_TIME"""
     return q_string
 
-database,dbconnection = util.script_startup('Graph connected session count')
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-1900 12:00:00')
+database, dbconnection = util.script_startup('Graph connected session count')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-1900 12:00:00')
 
-instance_number=util.input_with_default('Database Instance (1 if not RAC)','1')
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
 
-query = sessioncounts(start_time,end_time,instance_number)
+instance_number = util.input_with_default('Database Instance (1 if not RAC)', '1')
+
+query = sessioncounts(start_time, end_time, instance_number)
 
 results = dbconnection.run_return_flipped_results(query)
 
@@ -73,15 +75,15 @@ util.exit_no_results(results)
 date_times = results[0]
 session_counts = results[1]
 num_rows = len(date_times)
-            
+
 # plot query
-    
+
 myplot.xdatetimes = date_times
 myplot.ylists = [session_counts]
 
-myplot.title = "Number of connected sessions on "+database+" database, instance "+instance_number
+myplot.title = "Number of connected sessions on " + database + " database, instance " + instance_number
 myplot.ylabel1 = "Number of sessions"
-    
-myplot.ylistlabels=["logons current"]
+
+myplot.ylistlabels = ["logons current"]
 
 myplot.line()

@@ -28,7 +28,8 @@ Execution statistics for one SQL statement
 import myplot
 import util
 
-def simplesqlstat(sql_id,start_time,end_time,instance_number):
+
+def simplesqlstat(sql_id, start_time, end_time, instance_number):
     q_string = """
 select 
 END_INTERVAL_TIME,
@@ -46,7 +47,7 @@ case ss.executions_delta when 0 then 1 else ss.executions_delta end nonzeroexecu
 ELAPSED_TIME_DELTA
 from
 DBA_HIST_SQLSTAT ss,DBA_HIST_SNAPSHOT sn
-where ss.sql_id = '""" 
+where ss.sql_id = '"""
     q_string += sql_id
     q_string += """'
 and ss.snap_id=sn.snap_id
@@ -56,7 +57,7 @@ and ss.INSTANCE_NUMBER = """
 and ss.INSTANCE_NUMBER=sn.INSTANCE_NUMBER and
 END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
     q_string += start_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -67,25 +68,26 @@ to_date('"""
 order by snap_id,sql_id"""
     return q_string
 
-database,dbconnection = util.script_startup('Run statistics for one SQL id')
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-1900 12:00:00')
+database, dbconnection = util.script_startup('Run statistics for one SQL id')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-1900 12:00:00')
 
-instance_number=util.input_with_default('Database Instance (1 if not RAC)','1')
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
+
+instance_number = util.input_with_default('Database Instance (1 if not RAC)', '1')
 
 # Get user input
 
-sql_id=util.input_with_default('SQL_ID','acrg0q0qtx3gr')
+sql_id = util.input_with_default('SQL_ID', 'acrg0q0qtx3gr')
 
-q = simplesqlstat(sql_id,start_time,end_time,instance_number);
+q = simplesqlstat(sql_id, start_time, end_time, instance_number);
 
 r = dbconnection.run_return_flipped_results(q)
 
 # plot query
-    
-myplot.title = "Sql_id "+sql_id+" on "+database+" database, instance "+instance_number
+
+myplot.title = "Sql_id " + sql_id + " on " + database + " database, instance " + instance_number
 myplot.ylabel1 = "Number of executions"
 myplot.ylabel2 = "Averaged Elapsed Milliseconds"
 

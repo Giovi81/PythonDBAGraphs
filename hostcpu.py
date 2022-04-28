@@ -28,6 +28,7 @@ Shows the host level CPU percent used and load over time.
 import myplot
 import util
 
+
 def myoscpu(instance_number):
     """
     Create myoscpu table with CPU data for selected instance.
@@ -57,8 +58,9 @@ busy_v.INSTANCE_NUMBER = """
     q_string += instance_number
 
     return q_string
-    
-def cpuquery(start_time,end_time):
+
+
+def cpuquery(start_time, end_time):
     """
     Final query showing host cpu percent busy and load
     for the given date time range.
@@ -74,7 +76,7 @@ DBA_HIST_SNAPSHOT sn
 where 
 my.SNAP_ID = sn.SNAP_ID AND
 sn.END_INTERVAL_TIME between
-to_date('""" 
+to_date('"""
     q_string += start_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -85,18 +87,19 @@ order by my.SNAP_ID
     """
     return q_string
 
-database,dbconnection = util.script_startup('Host CPU')
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-1900 12:00:00')
+database, dbconnection = util.script_startup('Host CPU')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-1900 12:00:00')
 
-instance_number=util.input_with_default('Database Instance (1 if not RAC)','1')
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
+
+instance_number = util.input_with_default('Database Instance (1 if not RAC)', '1')
 
 # Get cpu busy, idle, and load for the selected instance
 
 dbconnection.run_return_no_results_catch_error("drop table myoscpu")
- 
+
 crmyoscpu = myoscpu(instance_number)
 
 dbconnection.run_return_no_results(crmyoscpu);
@@ -119,9 +122,8 @@ where before.SNAP_ID + 1 = after.SNAP_ID"""
 
 dbconnection.run_return_no_results(crmyoscpudiff)
 
+querytext = cpuquery(start_time, end_time)
 
-querytext = cpuquery(start_time,end_time)
-    
 results = dbconnection.run_return_flipped_results(querytext)
 
 util.exit_no_results(results)
@@ -130,10 +132,10 @@ util.exit_no_results(results)
 
 myplot.xdatetimes = results[0]
 myplot.ylists = results[1:]
-    
-myplot.title = "Host CPU for "+database+" database, instance "+instance_number
+
+myplot.title = "Host CPU for " + database + " database, instance " + instance_number
 myplot.ylabel1 = "CPU"
-    
-myplot.ylistlabels=["Percent busy","Load"]
+
+myplot.ylistlabels = ["Percent busy", "Load"]
 
 myplot.line()

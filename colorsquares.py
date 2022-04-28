@@ -36,14 +36,13 @@ Draws a square showing the colors in .1 increments.
 import argparse
 import myplot
 import util
-    
+
 parser = argparse.ArgumentParser(description='Display colors to choose from')
-parser.add_argument('fixed_color', choices=['r', 'g','b'], 
-                   help='Primary color to leave fixed')
-parser.add_argument('fixed_value',type=float,default=0.0,nargs='?',
-                   help='Value of fixed color between 0.0 and 1.0')
-                   
+parser.add_argument('fixed_color', choices=['r', 'g', 'b'],
+                    help='Primary color to leave fixed')
+parser.add_argument('fixed_value', type=float, default=0.0, nargs='?',
+                    help='Value of fixed color between 0.0 and 1.0')
 
 args = parser.parse_args()
 
-myplot.colorsquares(args.fixed_color,args.fixed_value)
+myplot.colorsquares(args.fixed_color, args.fixed_value)

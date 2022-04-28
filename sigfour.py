@@ -30,19 +30,19 @@ import signatures
 import myplot
 import util
 
-database,dbconnection = util.script_startup('SQL statments by signature four plots')
+database, dbconnection = util.script_startup('SQL statments by signature four plots')
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-1900 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-1900 12:00:00')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
 
-instance_number=util.input_with_default('Database Instance (1 if not RAC)','1')
+instance_number = util.input_with_default('Database Instance (1 if not RAC)', '1')
 
 queryobj = signatures.groupofsignatures()
 
-queryobj.set_start_end_instance(start_time,end_time,instance_number)
+queryobj.set_start_end_instance(start_time, end_time, instance_number)
 
-lines = util.read_config_file(util.config_dir,database+util.groupsigs_file)
+lines = util.read_config_file(util.config_dir, database + util.groupsigs_file)
 
 for line in lines:
     if len(line) > 0:
@@ -58,9 +58,9 @@ util.exit_no_results(results)
 
 myplot.xdatetimes = results[0]
 myplot.ylists = results[1:]
-    
-myplot.title = "SQL matching group of signatures on "+database+" database, instance "+instance_number+" four graphs"
-        
+
+myplot.title = "SQL matching group of signatures on " + database + " database, instance " + instance_number + " four graphs"
+
 myplot.ylabel1 = "CPU % Busy"
 myplot.ylabel2 = "Number of executions (/100000)"
 myplot.ylabel3 = "Average Elapsed Time (microseconds)"

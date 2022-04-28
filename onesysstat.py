@@ -29,7 +29,8 @@ for a given time period.
 import myplot
 import util
 
-def onesysstat(start_time,end_time,instance_number,stat_name):
+
+def onesysstat(start_time, end_time, instance_number, stat_name):
     """
     Build query for given statistic name stat_name.
     """
@@ -58,7 +59,7 @@ before.DBID = after.DBID and
 after.value >= before.value and
 sn.END_INTERVAL_TIME
 between 
-to_date('""" 
+to_date('"""
     q_string += start_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -66,23 +67,24 @@ to_date('"""
     q_string += end_time
     q_string += """','DD-MON-YYYY HH24:MI:SS')
 order by sn.SNAP_ID"""
-    
+
     return q_string
 
-database,dbconnection = util.script_startup('One System Statistic')
 
-start_time=util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2018 12:00:00')
+database, dbconnection = util.script_startup('One System Statistic')
 
-end_time=util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)','01-JAN-2200 12:00:00')
+start_time = util.input_with_default('Start date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2018 12:00:00')
 
-instance_number=util.input_with_default('Database Instance (1 if not RAC)','1')
+end_time = util.input_with_default('End date and time (DD-MON-YYYY HH24:MI:SS)', '01-JAN-2200 12:00:00')
 
-stat_name=util.input_with_default('System Statistic','bytes received via SQL*Net from client')
+instance_number = util.input_with_default('Database Instance (1 if not RAC)', '1')
+
+stat_name = util.input_with_default('System Statistic', 'bytes received via SQL*Net from client')
 
 # Get and run query for one system statistic
- 
-querytext = onesysstat(start_time,end_time,instance_number,stat_name)
-  
+
+querytext = onesysstat(start_time, end_time, instance_number, stat_name)
+
 results = dbconnection.run_return_flipped_results(querytext)
 
 util.exit_no_results(results)
@@ -91,10 +93,10 @@ util.exit_no_results(results)
 
 myplot.xdatetimes = results[0]
 myplot.ylists = results[1:]
-    
-myplot.title = "System statistic difference for "+database+" database, instance "+instance_number
+
+myplot.title = "System statistic difference for " + database + " database, instance " + instance_number
 myplot.ylabel1 = "Statistic value difference per snapshot"
-    
-myplot.ylistlabels=[stat_name]
+
+myplot.ylistlabels = [stat_name]
 
 myplot.line()

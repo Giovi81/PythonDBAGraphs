@@ -37,8 +37,8 @@ util.get_directories()
 util.get_user()
 
 # Prompt for password for Oracle user name
-    
-password=getpass.getpass('Enter password for '+util.my_oracle_user+': ')
+
+password = getpass.getpass('Enter password for ' + util.my_oracle_user + ': ')
 
 # Save encryption key
 
@@ -47,4 +47,3 @@ util.save_key()
 # Save encrypted password
 
 util.save_oracle_password(password)
-

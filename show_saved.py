@@ -35,7 +35,7 @@ file_name = util.input_no_default('Enter name of data file to be restored: ')
 # Restore data into all of the myplot module global variables that are used
 # by the different graphs
 
-plot_name = myplot.restore_data(file_name) 
+plot_name = myplot.restore_data(file_name)
 
 # Call the graphing routine that was used for this plot
 
@@ -48,4 +48,4 @@ elif plot_name == 'line_2subplots':
 elif plot_name == 'line_4subplots':
     myplot.line_4subplots()
 else:
-    print('Invalid plot_name = '+plot_name)
+    print('Invalid plot_name = ' + plot_name)

@@ -26,14 +26,15 @@ signatures from a text file to include in a query.
 
 """
 
+
 class groupofsignatures():
     def __init__(self):
         self.signatures = []
-        self.start_time='01-JAN-1900 12:00:00'
-        self.end_time='01-JAN-2200 12:00:00'
-        self.instance_number='1'
-         
-    def add_signature(self,signature):
+        self.start_time = '01-JAN-1900 12:00:00'
+        self.end_time = '01-JAN-2200 12:00:00'
+        self.instance_number = '1'
+
+    def add_signature(self, signature):
         """ 
         Add to the list of FORCE_MATCHING_SIGNATURE values
         for the query.
@@ -41,16 +42,16 @@ class groupofsignatures():
         # signatures has only one entry per signature
         if signature not in self.signatures:
             self.signatures.append(signature)
-            
-    def set_start_end_instance(self,start_time,end_time,instance_number):
+
+    def set_start_end_instance(self, start_time, end_time, instance_number):
         """
         Save the start and end time for the query and the instance
         number.
         """
-        self.start_time=start_time
-        self.end_time=end_time
-        self.instance_number=instance_number
-        
+        self.start_time = start_time
+        self.end_time = end_time
+        self.instance_number = instance_number
+
     def build_query(self):
         """ puts the query together"""
         q_string = """
@@ -75,12 +76,12 @@ and ss.FORCE_MATCHING_SIGNATURE in
             q_string += str(s)
             snum += 1;
             if snum < slen:
-                q_string += ",\n"             
+                q_string += ",\n"
         q_string += """
 ) and
 sn.END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
         q_string += self.start_time
         q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -89,9 +90,9 @@ to_date('"""
         q_string += """','DD-MON-YYYY HH24:MI:SS')
 group by sn.END_INTERVAL_TIME
 order by sn.END_INTERVAL_TIME
-"""        
+"""
         return q_string
-        
+
     def build_query2(self):
         """ 
         Restructures query for use with single plot with 
@@ -141,12 +142,12 @@ and ss.FORCE_MATCHING_SIGNATURE in
             q_string += str(s)
             snum += 1;
             if snum < slen:
-                q_string += ",\n"             
+                q_string += ",\n"
         q_string += """
 ) and
 sn.END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
         q_string += self.start_time
         q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -155,8 +156,9 @@ to_date('"""
         q_string += """','DD-MON-YYYY HH24:MI:SS')
 group by sn.END_INTERVAL_TIME
 order by sn.END_INTERVAL_TIME
-"""        
+"""
         return q_string
+
     def build_query3(self):
         """ 
         Build query for use with single plot with 
@@ -253,7 +255,7 @@ ss.FORCE_MATCHING_SIGNATURE in
             q_string += str(s)
             snum += 1;
             if snum < slen:
-                q_string += ",\n"             
+                q_string += ",\n"
         q_string += """
 )
 group by SNAP_ID) ela,
@@ -261,7 +263,7 @@ DBA_HIST_SNAPSHOT sn
 where 
 sn.END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
         q_string += self.start_time
         q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -271,7 +273,7 @@ to_date('"""
 pb.snap_id=ela.snap_id and
 pb.snap_id=sn.snap_id
 order by pb.snap_id
-"""        
+"""
         return q_string
 
     def build_query4(self):
@@ -329,7 +331,7 @@ ss.FORCE_MATCHING_SIGNATURE in
             q_string += str(s)
             snum += 1;
             if snum < slen:
-                q_string += ",\n"             
+                q_string += ",\n"
         q_string += """
 )
 group by SNAP_ID) ela,
@@ -350,7 +352,7 @@ DBA_HIST_SNAPSHOT sn
 where 
 sn.END_INTERVAL_TIME 
 between 
-to_date('""" 
+to_date('"""
         q_string += self.start_time
         q_string += """','DD-MON-YYYY HH24:MI:SS')
 and 
@@ -361,5 +363,5 @@ pb.snap_id=ela.snap_id and
 pb.snap_id=rd.snap_id and
 pb.snap_id=sn.snap_id
 order by pb.snap_id
-"""        
+"""
         return q_string
